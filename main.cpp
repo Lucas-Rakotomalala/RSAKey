@@ -4,6 +4,9 @@
 #include <numeric>
 #include <algorithm>
 
+#include <boost/multiprecision/cpp_int.hpp>
+using boost::multiprecision::cpp_int;
+
 using namespace std;
 
 class KeyGeneration
@@ -15,6 +18,10 @@ public:
     unsigned phi_n; //phi_n = (p-1) +(q-1)
     unsigned e;     //1 < e <phi_n; e and phi_n coprime
     unsigned d;     //(e+d) mod phi_n = 1
+    unsigned m;     //secret message
+
+    boost::multiprecision::cpp_int c;   //ciphertex
+    boost::multiprecision::cpp_int m_0; //result of decryption
 
     void prompter();
     void primality_check();
@@ -22,6 +29,9 @@ public:
     unsigned calculate_phi();
     unsigned calculate_e();
     unsigned calculate_d();
+
+    boost::multiprecision::cpp_int encrypt();
+    boost::multiprecision::cpp_int decrypt();
 };
 
 void KeyGeneration::prompter()
@@ -94,6 +104,22 @@ unsigned KeyGeneration::calculate_d()
     return d;
 }
 
+boost::multiprecision::cpp_int KeyGeneration::encrypt()
+{
+    cout << "Please enter in a message m to encrypt: " << endl;
+    cin >> m;
+    c = (boost::multiprecision::cpp_int(boost::multiprecision::pow(boost::multiprecision::cpp_int(m), e))) % n;
+
+    return c;
+}
+
+boost::multiprecision::cpp_int KeyGeneration::decrypt()
+{
+    m_0 = (boost::multiprecision::cpp_int(boost::multiprecision::pow(boost::multiprecision::cpp_int(c), d))) % n;
+
+    return m_0;
+}
+
 int main(int argc, const char *argv[])
 {
     try
@@ -105,6 +131,9 @@ int main(int argc, const char *argv[])
         cout << obj1.calculate_phi() << endl;
         cout << obj1.calculate_e() << endl;
         cout << obj1.calculate_d() << endl;
+
+        cout << obj1.encrypt() << endl;
+        cout << obj1.decrypt() << endl;
     }
     catch (runtime_error &s)
     {
